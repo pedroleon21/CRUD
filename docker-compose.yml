@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+    db:
+        build:
+            context: node-mongo-compose
+            dockerfile: Dockerfile
+        command: npm start
+        volumes:
+            - ./node-mongo-compose:/usr/src/app
+        ports:
+            - 9000:9000
+        depends_on:
+            - mongo
+        networks:
+            - backend
+            - frontend
+
+    api:
+        build:
+            context: api
+            dockerfile: Dockerfile
+        command: npm start
+        volumes:
+            - ./api:/usr/src/app
+        ports:
+            - 9001:9001
+        depends_on:
+            - contact
+        networks:
+            - backend
+            - frontend
+
+    landing:
+        image: nginx
+        volumes:
+            - ./02_landing/:/usr/share/nginx/html
+        ports:
+            - 8080:80
+        networks:
+            - frontend
+
+    mongo:
+        image: mongo
+        ports:
+            - 27017:27017
+        networks:
+            - backend
+
+networks:
+    backend:
+        driver: bridge
+    frontend:
+        driver: bridge
